@@ -44,9 +44,14 @@ OBJ_DEBUG = $(OBJDIR_DEBUG)/src/msg_queue.o $(OBJDIR_DEBUG)/src/posix_object.o $
 
 OBJ_RELEASE = $(OBJDIR_RELEASE)/src/msg_queue.o $(OBJDIR_RELEASE)/src/posix_object.o $(OBJDIR_RELEASE)/src/posix_semaphore.o $(OBJDIR_RELEASE)/src/result.o $(OBJDIR_RELEASE)/src/shared_memory.o
 
-all: debug release
+all: before_build build_debug build_release after_build
 
 clean: clean_debug clean_release
+
+before_build: 
+
+after_build: 
+	cbp2make -in ipclib.cbp -out Makefile
 
 before_debug: 
 	test -d bin/Debug || mkdir -p bin/Debug
@@ -54,7 +59,9 @@ before_debug:
 
 after_debug: 
 
-debug: before_debug out_debug after_debug
+build_debug: before_debug out_debug after_debug
+
+debug: before_build build_debug after_build
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG)  -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG)
@@ -85,7 +92,9 @@ before_release:
 
 after_release: 
 
-release: before_release out_release after_release
+build_release: before_release out_release after_release
+
+release: before_build build_release after_build
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE)  -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE)
@@ -110,5 +119,5 @@ clean_release:
 	rm -rf bin/Release
 	rm -rf $(OBJDIR_RELEASE)/src
 
-.PHONY: before_debug after_debug clean_debug before_release after_release clean_release
+.PHONY: before_build after_build before_debug after_debug clean_debug before_release after_release clean_release
 
